@@ -1,0 +1,172 @@
+version: '3.7'
+services:
+    prometheus:
+        image: prom/prometheus:v2.15.2
+        container_name: prometheus
+        networks:
+            - container-link
+        expose:
+            - 9090
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ./prometheus:/etc/prometheus
+            - prometheus_data:/prometheus
+        command:
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.path=/prometheus'
+            - '--web.console.libraries=/etc/prometheus/console_libraries'
+            - '--web.console.templates=/etc/prometheus/consoles'
+            - '--storage.tsdb.retention.time=200h'
+            - '--web.enable-lifecycle'
+        labels:
+            org.label-schema.group: "monitoring"
+        init: true
+        restart: unless-stopped
+
+    alertmanager:
+        image: prom/alertmanager:v0.20.0
+        container_name: alertmanager
+        networks:
+            - container-link
+        expose:
+            - 9093
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ./alertmanager:/etc/alertmanager
+        command:
+            - '--config.file=/etc/alertmanager/config.yml'
+            - '--storage.path=/alertmanager'
+        labels:
+            org.label-schema.group: "monitoring"
+        init: true
+        restart: unless-stopped
+
+    nodeexporter:
+        image: prom/node-exporter:v0.18.1
+        container_name: nodeexporter
+        networks:
+            - container-link
+        expose:
+            - 9100
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - '--path.procfs=/host/proc'
+            - '--path.rootfs=/rootfs'
+            - '--path.sysfs=/host/sys'
+            - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+        labels:
+            org.label-schema.group: "monitoring"
+        init: true
+        restart: unless-stopped
+
+    cadvisor:
+        image: gcr.io/google-containers/cadvisor:v0.34.0
+        container_name: cadvisor
+        networks:
+            - container-link
+        expose:
+            - 8080
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+#            - /var/lib/docker:/var/lib/docker:ro
+            - /volume2/@docker:/var/lib/docker:ro
+            #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
+        labels:
+            org.label-schema.group: "monitoring"
+        init: true
+        restart: unless-stopped
+
+    grafana:
+        image: grafana/grafana:6.6.1
+        container_name: grafana
+        networks:
+            - container-link
+        expose:
+            - 3000
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - grafana_data:/var/lib/grafana
+            - ./grafana/provisioning:/etc/grafana/provisioning
+            - ../tv-recorder/mariadb/sock:/var/run/epgstation_mysqld
+        environment:
+            - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+            - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+            - GF_USERS_ALLOW_SIGN_UP=false
+        labels:
+            org.label-schema.group: "monitoring"
+        init: true
+        restart: unless-stopped
+
+    pushgateway:
+        image: prom/pushgateway:v1.1.0
+        container_name: pushgateway
+        networks:
+            - container-link
+        expose:
+            - 9091
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+        labels:
+            org.label-schema.group: "monitoring"
+        init: true
+        restart: unless-stopped
+
+    caddy:
+        image: stefanprodan/caddy
+        container_name: caddy
+        networks:
+            - container-link
+        ports:
+            - "3000:3000"
+            - "9090:9090"
+            - "9093:9093"
+            - "9091:9091"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ./caddy:/etc/caddy
+        environment:
+            - ADMIN_USER=${ADMIN_USER:-admin}
+            - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+        labels:
+            org.label-schema.group: "monitoring"
+        init: true
+        restart: unless-stopped
+
+#    speedtest-exporter:
+#        build:
+#            context: speedtest-exporter
+#        container_name: speedtest-exporter
+#        image: collelog/speedtest-exporter-alpine3.11
+#        networks:
+#            - container-link
+#        ports:
+#            - 9104
+#        volumes:
+#            - /etc/localtime:/etc/localtime:ro
+#        labels:
+#            org.label-schema.group: "monitoring"
+#        init: true
+#        restart: unless-stopped
+
+networks:
+    default:
+        external:
+            name: bridge
+
+    container-link:
+        name: tv-recorder-monitoring
+        driver: bridge
+
+volumes:
+    prometheus_data:
+        driver: 'local'
+
+    grafana_data:
+        driver: 'local'

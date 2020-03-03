@@ -1,0 +1,23 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus:9090
+    basicAuth: false
+    isDefault: true
+    editable: true
+
+  - name: EPGStation
+    type: mysql
+    access: proxy
+    orgId: 1
+    url: /var/run/epgstation_mysqld/mysqld.sock
+    user: grafana
+    password: grafana
+    database: epgstation
+    basicAuth: false
+    isDefault: false
+    editable: true
