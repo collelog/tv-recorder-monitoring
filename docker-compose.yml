@@ -139,22 +139,6 @@ services:
         init: true
         restart: unless-stopped
 
-#    speedtest-exporter:
-#        build:
-#            context: speedtest-exporter
-#        container_name: speedtest-exporter
-#        image: collelog/speedtest-exporter-alpine3.11
-#        networks:
-#            - container-link
-#        ports:
-#            - 9104
-#        volumes:
-#            - /etc/localtime:/etc/localtime:ro
-#        labels:
-#            org.label-schema.group: "monitoring"
-#        init: true
-#        restart: unless-stopped
-
 networks:
     default:
         external:
