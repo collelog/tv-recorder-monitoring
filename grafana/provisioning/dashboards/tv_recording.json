@@ -1377,7 +1377,8 @@
       "30d"
     ]
   },
-  "timezone": "browser",
-  "title": "TV Recorder",
+  "timezone": "",
+  "title": "TV Recording",
+  "uid": null,
   "version": 1
 }
