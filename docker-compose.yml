@@ -23,23 +23,23 @@ services:
         init: true
         restart: unless-stopped
 
-    alertmanager:
-        image: prom/alertmanager:v0.20.0
-        container_name: alertmanager
-        networks:
-            - container-link
-        expose:
-            - 9093
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
-            - ./alertmanager:/etc/alertmanager
-        command:
-            - '--config.file=/etc/alertmanager/config.yml'
-            - '--storage.path=/alertmanager'
-        labels:
-            org.label-schema.group: "monitoring"
-        init: true
-        restart: unless-stopped
+#    alertmanager:
+#        image: prom/alertmanager:v0.20.0
+#        container_name: alertmanager
+#        networks:
+#            - container-link
+#        expose:
+#            - 9093
+#        volumes:
+#            - /etc/localtime:/etc/localtime:ro
+#            - ./alertmanager:/etc/alertmanager
+#        command:
+#            - '--config.file=/etc/alertmanager/config.yml'
+#            - '--storage.path=/alertmanager'
+#        labels:
+#            org.label-schema.group: "monitoring"
+#        init: true
+#        restart: unless-stopped
 
     nodeexporter:
         image: prom/node-exporter:v0.18.1
@@ -76,7 +76,7 @@ services:
             - /var/run:/var/run:rw
             - /sys:/sys:ro
 #            - /var/lib/docker:/var/lib/docker:ro
-            - /volume2/@docker:/var/lib/docker:ro
+            - /volume1/@docker:/var/lib/docker:ro
             #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
         labels:
             org.label-schema.group: "monitoring"
@@ -104,19 +104,19 @@ services:
         init: true
         restart: unless-stopped
 
-    pushgateway:
-        image: prom/pushgateway:v1.1.0
-        container_name: pushgateway
-        networks:
-            - container-link
-        expose:
-            - 9091
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
-        labels:
-            org.label-schema.group: "monitoring"
-        init: true
-        restart: unless-stopped
+#    pushgateway:
+#        image: prom/pushgateway:v1.1.0
+#        container_name: pushgateway
+#        networks:
+#            - container-link
+#        expose:
+#            - 9091
+#        volumes:
+#            - /etc/localtime:/etc/localtime:ro
+#        labels:
+#            org.label-schema.group: "monitoring"
+#        init: true
+#        restart: unless-stopped
 
     caddy:
         image: stefanprodan/caddy
@@ -134,6 +134,39 @@ services:
         environment:
             - ADMIN_USER=${ADMIN_USER:-admin}
             - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+        labels:
+            org.label-schema.group: "monitoring"
+        init: true
+        restart: unless-stopped
+
+#    speedtest-exporter:
+#        build:
+#            context: speedtest-exporter
+#        container_name: speedtest-exporter
+#        image: collelog/speedtest-exporter-alpine3.11
+#        networks:
+#            - container-link
+#        expose:
+#            - 9683
+#        volumes:
+#            - /etc/localtime:/etc/localtime:ro
+#        labels:
+#            org.label-schema.group: "monitoring"
+#        init: true
+#        restart: unless-stopped
+
+    mirakurun-exporter:
+        build:
+            context: mirakurun-exporter
+        container_name: mirakurun-exporter
+        image: collelog/mirakurun-exporter-alpine3.11
+        networks:
+            - container-link
+        expose:
+            - 9684
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ../tv-recorder/mirakurun/sock:/var/run/mirakurun
         labels:
             org.label-schema.group: "monitoring"
         init: true

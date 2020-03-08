@@ -8,8 +8,8 @@ global:
       monitor: 'docker-host-alpha'
 
 # Load and evaluate rules in this file every 'evaluation_interval' seconds.
-rule_files:
-  - "alert.rules"
+#rule_files:
+#  - "alert.rules"
 
 # A scrape configuration containing exactly one endpoint to scrape.
 scrape_configs:
@@ -28,11 +28,23 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'pushgateway'
-    scrape_interval: 10s
+#  - job_name: 'pushgateway'
+#    scrape_interval: 10s
+#    honor_labels: true
+#    static_configs:
+#      - targets: ['pushgateway:9091']
+
+#  - job_name: 'speedtest-exporter'
+#    scrape_interval: 10m
+#    honor_labels: true
+#    static_configs:
+#      - targets: ['speedtest-exporter:9683']
+
+  - job_name: 'mirakurun-exporter'
+    scrape_interval: 300s
     honor_labels: true
     static_configs:
-      - targets: ['pushgateway:9091']
+      - targets: ['mirakurun-exporter:9684']
 
 #alerting:
 #  alertmanagers:
@@ -40,3 +52,13 @@ scrape_configs:
 #    static_configs:
 #    - targets: 
 #      - 'alertmanager:9093'
+#
+#  - job_name: 'nginx'
+#    scrape_interval: 10s
+#    static_configs:
+#      - targets: ['nginxexporter:9113']
+#
+#  - job_name: 'aspnetcore'
+#    scrape_interval: 10s
+#    static_configs:
+#      - targets: ['eventlog-proxy:5000', 'eventlog:5000']
