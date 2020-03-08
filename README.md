@@ -18,9 +18,9 @@ Docker hosts and containers monitoring with Prometheus, Grafana, cAdvisor, NodeE
 
 
 ### 主な機能
-- TV録画系コンテナ群の情報を集約したダッシュボード「TV Recording」を用意しました。
-  - EPGStation V1.6.xの録画番組数・ドロップ数をグラフ化します。
-- MirakurunのStatus APIから性能情報を収集するPrometheus exporter（Dockerコンテナ：mirakurun-exporter）を用意しました。
+- TV録画系コンテナ群の情報を集約したダッシュボード「TV Recorder」を用意しました。
+  - [EPGStation](https://github.com/l3tnun/EPGStation) V1.6.xの録画番組数・ドロップ数をグラフ化します。
+- [Mirakurun](https://github.com/Chinachu/Mirakurun)のStatus APIから性能情報を収集するPrometheus exporter（Dockerコンテナ：mirakurun-exporter）を用意しました。
   - ダッシュボード「Mirakurun」でグラフ化しています。
 
 ## 開発環境
